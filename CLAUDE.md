@@ -25,14 +25,48 @@ source venv/bin/activate
 # Install dependencies
 pip install -r requirements.txt
 
-# Run the application
-python -m invoice_fetcher fetch --team engineering
+# Install in development mode
+pip install -e .
 
-# Development commands
-python -m pytest                    # Run tests
-python -m black .                   # Format code
-python -m flake8 .                  # Lint code
-python -m mypy .                    # Type checking
+# Run the application
+invoice-fetcher fetch --team engineering
+# or
+python -m invoice_fetcher.cli fetch --team engineering
+
+# Build and packaging commands
+python setup.py sdist bdist_wheel    # Build distribution packages
+pip install --upgrade build          # Install build tool
+python -m build                      # Modern build command
+
+# Test commands
+python -m pytest                     # Run all tests
+python -m pytest -v                  # Run tests with verbose output
+python -m pytest --cov               # Run tests with coverage
+python -m pytest tests/test_cli.py   # Run specific test file
+python -m pytest -k "test_config"    # Run tests matching pattern
+
+# Code quality commands
+python -m black .                    # Format code
+python -m black --check .            # Check formatting without changes
+python -m flake8 .                   # Lint code
+python -m flake8 --max-line-length=88 .  # Lint with Black-compatible line length
+python -m mypy .                     # Type checking
+python -m mypy invoice_fetcher/       # Type check specific package
+
+# Combined quality check
+python -m black . && python -m flake8 . && python -m mypy . && python -m pytest
+
+# Application commands
+invoice-fetcher setup                 # Initial setup and credential configuration
+invoice-fetcher fetch --team engineering --days 30  # Fetch invoices for specific team
+invoice-fetcher fetch --team marketing --dry-run     # Dry run mode
+invoice-fetcher list-invoices         # List all downloaded invoices
+invoice-fetcher list-invoices --team engineering --year 2024  # Filtered list
+
+# Development utilities
+python -c "import invoice_fetcher; print(invoice_fetcher.__version__)"  # Check version
+pip show invoice-fetcher              # Show package information
+pip list | grep invoice               # List related packages
 ```
 
 ## Project Structure

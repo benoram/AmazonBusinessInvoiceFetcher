@@ -1,0 +1,31 @@
+# Default configuration for Amazon Business Invoice Fetcher
+
+# Directory where invoices will be downloaded and organized
+download_dir: "~/Downloads/invoices"
+
+# Selenium WebDriver configuration
+selenium:
+  driver: "chrome"          # WebDriver to use (currently only chrome supported)
+  headless: true           # Run browser in headless mode
+  timeout: 30              # Default timeout for element waits (seconds)
+  page_load_timeout: 30    # Page load timeout (seconds)
+
+# Amazon Business configuration
+amazon:
+  business_url: "https://business.amazon.com"
+  login_timeout: 60        # Maximum time to wait for login (seconds)
+
+# Logging configuration
+logging:
+  level: "INFO"            # Log level (DEBUG, INFO, WARNING, ERROR)
+  file: null               # Log file path (null for console only)
+
+# Team-specific settings (optional)
+teams:
+  engineering:
+    # Optional team-specific download directory
+    # download_dir: "~/Downloads/invoices/engineering"
+  
+  marketing:
+    # Optional team-specific settings
+    # download_dir: "~/Downloads/invoices/marketing"
