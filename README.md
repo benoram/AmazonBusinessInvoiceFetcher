@@ -39,7 +39,7 @@ Before using this tool, ensure you have:
 
 2. **Create a virtual environment**:
    ```bash
-   python -m venv venv
+   python3 -m venv venv
    source venv/bin/activate  # On Windows: venv\Scripts\activate
    ```
 
@@ -194,7 +194,7 @@ Example: `2024-03-15--249.99--123-4567890-1234567.pdf`
    ```bash
    git clone <repository-url>
    cd AmazonBusinessInvoiceFetcher
-   python -m venv venv
+   python3 -m venv venv
    source venv/bin/activate
    pip install -r requirements.txt
    ```
@@ -208,32 +208,32 @@ Example: `2024-03-15--249.99--123-4567890-1234567.pdf`
 
 ```bash
 # Run all tests
-python -m pytest
+python3 -m pytest
 
 # Run tests with coverage
-python -m pytest --cov
+python3 -m pytest --cov
 
 # Run specific test file
-python -m pytest tests/test_cli.py
+python3 -m pytest tests/test_cli.py
 
 # Run tests with verbose output
-python -m pytest -v
+python3 -m pytest -v
 ```
 
 ### Code Quality
 
 ```bash
 # Format code
-python -m black .
+python3 -m black .
 
 # Check code style
-python -m flake8 . --max-line-length=88
+python3 -m flake8 . --max-line-length=88
 
 # Type checking
-python -m mypy invoice_fetcher/
+python3 -m mypy invoice_fetcher/
 
 # Run all quality checks
-python -m black . && python -m flake8 . --max-line-length=88 && python -m mypy invoice_fetcher/ && python -m pytest
+python3 -m black . && python3 -m flake8 . --max-line-length=88 && python3 -m mypy invoice_fetcher/ && python3 -m pytest
 ```
 
 ### Building Distribution
@@ -243,7 +243,7 @@ python -m black . && python -m flake8 . --max-line-length=88 && python -m mypy i
 pip install --upgrade build
 
 # Build distribution packages
-python -m build
+python3 -m build
 
 # The built packages will be in the dist/ directory
 ```
