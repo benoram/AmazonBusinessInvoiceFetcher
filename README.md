@@ -17,7 +17,7 @@ A command-line tool for automatically downloading and organizing invoices from A
 ### Prerequisites
 
 - Python 3.9 or higher
-- Google Chrome browser (for web automation)
+- Google Chrome browser (latest version recommended for web automation)
 - macOS (tested on Apple Silicon Macs)
 - Amazon Business account with invoice access
 
@@ -253,8 +253,9 @@ python3 -m build
 ### Common Issues
 
 1. **Chrome Driver Issues**:
-   - The tool automatically downloads the Chrome driver
-   - If you encounter issues, try updating Chrome to the latest version
+   - The tool automatically downloads the latest Chrome driver version
+   - Chrome version 138+ is supported with automatic driver management
+   - If you encounter issues, ensure Chrome is updated to the latest version
    - For headless mode issues, try setting `SELENIUM_HEADLESS=false`
 
 2. **Authentication Problems**:

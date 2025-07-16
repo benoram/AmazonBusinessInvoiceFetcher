@@ -51,10 +51,11 @@ class AmazonBusinessAuth:
             chrome_options.add_argument("--window-size=1920,1080")
             chrome_options.add_argument(
                 "--user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
-                "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+                "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
             )
 
             # Set up Chrome service with auto-downloaded driver
+            # Get latest ChromeDriver version
             service = Service(ChromeDriverManager().install())
 
             driver = webdriver.Chrome(service=service, options=chrome_options)
