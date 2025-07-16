@@ -26,6 +26,9 @@ class Config:
         "amazon": {
             "business_url": "https://business.amazon.com",
             "login_timeout": 60,
+            "use_sso": False,
+            "sso_timeout": 300,
+            "sso_url": None,
             "email": None,
         },
         "logging": {
@@ -81,6 +84,7 @@ class Config:
         env_mappings = {
             "AMAZON_BUSINESS_EMAIL": ["amazon", "email"],
             "AMAZON_BUSINESS_PASSWORD": ["amazon", "password"],
+            "AMAZON_SSO_URL": ["amazon", "sso_url"],
             "INVOICE_DOWNLOAD_DIR": ["download_dir"],
             "SELENIUM_HEADLESS": ["selenium", "headless"],
             "SELENIUM_TIMEOUT": ["selenium", "timeout"],

@@ -272,11 +272,19 @@ class AmazonBusinessAuth:
         self.driver = self._setup_driver(interactive=True)
 
         try:
-            # Navigate to Amazon Business
-            business_url = self.config.get(
-                "amazon.business_url", "https://business.amazon.com"
-            )
-            self.driver.get(business_url)
+            # Get SSO URL from config or use Amazon Business URL as fallback
+            sso_url = self.config.get("amazon.sso_url")
+            if sso_url:
+                print(f"Navigating to SSO login page: {sso_url}")
+                self.driver.get(sso_url)
+            else:
+                # Fallback to Amazon Business URL if no SSO URL configured
+                business_url = self.config.get(
+                    "amazon.business_url", "https://business.amazon.com"
+                )
+                print(f"No SSO URL configured. Navigating to: {business_url}")
+                print("Tip: Set 'sso_url' in config for direct SSO login.")
+                self.driver.get(business_url)
 
             # Wait for user to complete SSO login
             wait = WebDriverWait(

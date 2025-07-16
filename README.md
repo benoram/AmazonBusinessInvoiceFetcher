@@ -66,6 +66,9 @@ export AMAZON_BUSINESS_EMAIL="your-email@company.com"
 # Optional: Password (if not set, will be prompted and stored securely)
 export AMAZON_BUSINESS_PASSWORD="your-password"
 
+# Optional: SSO/Okta URL for direct SSO login
+export AMAZON_SSO_URL="https://company.okta.com/home/amazon_business/..."
+
 # Optional: Custom download directory
 export INVOICE_DOWNLOAD_DIR="~/Documents/invoices"
 
@@ -97,6 +100,7 @@ amazon:
   login_timeout: 60
   use_sso: false
   sso_timeout: 300
+  sso_url: null  # SSO/Okta login URL (overridden by AMAZON_SSO_URL env var)
   email: null  # Your Amazon Business email (overridden by AMAZON_BUSINESS_EMAIL env var)
 
 # Logging
@@ -120,6 +124,29 @@ This will:
 - Prompt for your Amazon Business email and password
 - Store credentials securely in your system keyring
 - Test the authentication
+
+#### SSO/Okta Authentication
+
+If your company uses SSO (Single Sign-On) with Okta for Amazon Business:
+
+1. **Configure your SSO URL** in `~/.invoice-fetcher/config.yaml`:
+   ```yaml
+   amazon:
+     use_sso: true
+     sso_url: "https://company.okta.com/home/amazon_business/..."
+   ```
+   
+   Or set the environment variable:
+   ```bash
+   export AMAZON_SSO_URL="https://company.okta.com/home/amazon_business/..."
+   ```
+
+2. **Use the --sso flag** when fetching invoices:
+   ```bash
+   invoice-fetcher fetch --team engineering --sso
+   ```
+
+The browser will open to your Okta login page where you can authenticate with your company credentials.
 
 ### Fetching Invoices
 
