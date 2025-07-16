@@ -294,6 +294,15 @@ class AmazonBusinessAuth:
             print("Waiting for you to complete the SSO login...")
             print("(This will timeout after 5 minutes)\n")
 
+            # First wait for redirect to Amazon Business domain
+            print("Waiting for redirect to Amazon Business...")
+            try:
+                wait.until(lambda driver: "amazon.com" in driver.current_url.lower())
+                print(f"✅ Redirected to Amazon: {self.driver.current_url}")
+            except TimeoutException:
+                print(f"⚠️  Still on: {self.driver.current_url}")
+                print("Continuing to wait for login elements...")
+
             # Wait for successful login by checking for post-login elements
             post_login_selectors = [
                 "#nav-link-accountList",
@@ -302,26 +311,94 @@ class AmazonBusinessAuth:
                 "#business-nav",
                 "[data-testid='business-header']",
                 ".ab-user-menu",
+                "#nav-user-name",
+                ".nav-line-1",
+                "[data-nav-role='user-menu']",
             ]
 
             logged_in = False
-            for selector in post_login_selectors:
+            print("Checking for login success indicators...")
+
+            for i, selector in enumerate(post_login_selectors):
                 try:
-                    wait.until(
+                    print(
+                        f"Checking selector {i+1}/{len(post_login_selectors)}: "
+                        f"{selector}"
+                    )
+                    # Use shorter timeout for each individual selector check
+                    element_wait = WebDriverWait(
+                        self.driver, 10
+                    )  # 10 seconds per selector
+                    element_wait.until(
                         EC.presence_of_element_located((By.CSS_SELECTOR, selector))
                     )
+
                     # Also check that we're not on a login page
                     current_url = self.driver.current_url.lower()
-                    if "signin" not in current_url and "ap/signin" not in current_url:
+                    print(f"Current URL: {current_url}")
+
+                    if (
+                        "signin" not in current_url
+                        and "ap/signin" not in current_url
+                        and "okta.com" not in current_url
+                    ):
                         logged_in = True
+                        print(f"✅ Found login indicator: {selector}")
                         break
                 except TimeoutException:
+                    print(f"❌ Selector not found: {selector}")
+                    continue
+                except Exception as e:
+                    print(f"❌ Error checking selector {selector}: {e}")
                     continue
 
             if not logged_in:
-                raise AuthenticationError(
-                    "SSO login timeout - could not verify successful authentication"
+                print(
+                    "❌ No specific login indicators found. "
+                    "Trying alternative detection..."
                 )
+
+                # Alternative: Check if we're on Amazon Business and not on login page
+                current_url = self.driver.current_url.lower()
+                if (
+                    "amazon.com" in current_url
+                    and "signin" not in current_url
+                    and "ap/signin" not in current_url
+                    and "okta.com" not in current_url
+                ):
+
+                    # Check if login form is NOT present (indicating successful login)
+                    login_form_selectors = [
+                        "#ap_email",
+                        "#ap_password",
+                        "input[name='email']",
+                        "input[name='password']",
+                        "#signin-button",
+                    ]
+
+                    login_form_present = False
+                    for selector in login_form_selectors:
+                        try:
+                            self.driver.find_element(By.CSS_SELECTOR, selector)
+                            login_form_present = True
+                            break
+                        except Exception:
+                            continue
+
+                    if not login_form_present:
+                        print("✅ Login successful (no login form detected)")
+                        logged_in = True
+                    else:
+                        print("❌ Login form still present")
+
+                if not logged_in:
+                    print(f"❌ Current URL: {self.driver.current_url}")
+                    print("❌ Authentication verification failed")
+                    raise AuthenticationError(
+                        "SSO login timeout - could not verify successful "
+                        "authentication. Please check if you successfully logged in "
+                        "and reached Amazon Business."
+                    )
 
             print("✅ SSO login successful!\n")
 
