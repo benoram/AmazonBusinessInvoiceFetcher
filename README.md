@@ -95,6 +95,9 @@ selenium:
 amazon:
   business_url: "https://business.amazon.com"
   login_timeout: 60
+  use_sso: false
+  sso_timeout: 300
+  email: null  # Your Amazon Business email (overridden by AMAZON_BUSINESS_EMAIL env var)
 
 # Logging
 logging:
