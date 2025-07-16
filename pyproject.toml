@@ -1,0 +1,43 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "invoice-fetcher"
+version = "0.1.0"
+description = "A CLI tool for automatically downloading and organizing invoices from Amazon Business"
+readme = "README.md"
+requires-python = ">=3.9"
+license = "MIT"
+authors = [
+    {name = "Amazon Business Invoice Fetcher"}
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+]
+dependencies = [
+    "click>=8.1.0",
+    "selenium>=4.15.0",
+    "requests>=2.31.0",
+    "pyyaml>=6.0",
+    "python-dateutil>=2.8.2",
+    "keyring>=24.0.0",
+    "rich>=13.0.0",
+    "webdriver-manager>=4.0.0",
+]
+
+[project.scripts]
+invoice-fetcher = "invoice_fetcher.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["invoice_fetcher*"]
+
+[tool.setuptools.package-data]
+invoice_fetcher = ["py.typed"]
