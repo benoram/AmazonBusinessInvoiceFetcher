@@ -58,8 +58,10 @@ python -m black . && python -m flake8 . && python -m mypy . && python -m pytest
 
 # Application commands
 invoice-fetcher setup                 # Initial setup and credential configuration
+invoice-fetcher setup --sso           # Setup with SSO authentication (no password needed)
 invoice-fetcher fetch --team engineering --days 30  # Fetch invoices for specific team
 invoice-fetcher fetch --team marketing --dry-run     # Dry run mode
+invoice-fetcher fetch --team engineering --sso       # Fetch with SSO authentication
 invoice-fetcher list-invoices         # List all downloaded invoices
 invoice-fetcher list-invoices --team engineering --year 2024  # Filtered list
 

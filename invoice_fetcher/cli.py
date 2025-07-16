@@ -210,7 +210,12 @@ def fetch(team: str, days: int, config: str, dry_run: bool, sso: bool):
 
 @main.command()
 @click.option("--config", type=click.Path(), help="Path to configuration file")
-def setup(config: str):
+@click.option(
+    "--sso",
+    is_flag=True,
+    help="Use SSO authentication (skips password prompt)",
+)
+def setup(config: str, sso: bool):
     """Set up configuration and credentials."""
 
     try:
@@ -231,15 +236,19 @@ def setup(config: str):
         if not email:
             email = click.prompt("Amazon Business email")
 
-        # Prompt for password and store in keyring
-        import getpass
-
-        password = getpass.getpass("Amazon Business password: ")
-
         auth = AmazonBusinessAuth(cfg)
-        auth.store_password(email, password)
 
-        print_success("Credentials stored securely in system keyring")
+        if not sso:
+            # Prompt for password and store in keyring
+            import getpass
+
+            password = getpass.getpass("Amazon Business password: ")
+            auth.store_password(email, password)
+
+            print_success("Credentials stored securely in system keyring")
+        else:
+            print_info("SSO authentication configured - no password needed")
+
         print_info(f"Configuration file: {config_path}")
         print_info(f"Download directory: {cfg.download_dir}")
 
@@ -247,8 +256,14 @@ def setup(config: str):
         console.print("\n[bold yellow]Testing authentication...[/bold yellow]")
 
         try:
-            with auth:
-                print_success("Authentication test successful!")
+            if sso:
+                print_info("Using SSO authentication - browser will open for login")
+                with auth:
+                    auth.login(interactive=True)
+                    auth.logout()
+            else:
+                with auth:
+                    print_success("Authentication test successful!")
         except AuthenticationError as e:
             print_error(f"Authentication test failed: {e}")
             sys.exit(1)

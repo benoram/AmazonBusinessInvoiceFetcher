@@ -55,6 +55,7 @@ invoices/
 - Handle Amazon Business login via web automation
 - Maintain session cookies for API calls
 - Support MFA if required
+- Support SSO authentication with interactive browser login
 
 #### 2. Invoice API Client
 - Interface with Amazon Business invoice endpoints
@@ -109,12 +110,14 @@ invoice-fetcher fetch --team <team_name> [options]
 - `--dry-run`: Show what would be downloaded without actually downloading
 - `--verbose`: Enable detailed logging
 - `--config <path>`: Use custom config file location
+- `--sso`: Use SSO authentication (opens browser for interactive login)
 
 ### Additional Commands
 ```bash
-invoice-fetcher config        # View current configuration
-invoice-fetcher login         # Test Amazon Business authentication
-invoice-fetcher list-teams    # Show available teams
+invoice-fetcher setup                 # Initial setup and credential configuration
+invoice-fetcher setup --sso           # Setup with SSO authentication (no password needed)
+invoice-fetcher list-invoices         # List all downloaded invoices
+invoice-fetcher list-invoices --team engineering --year 2024  # Filtered list
 ```
 
 ## Error Handling
