@@ -29,13 +29,19 @@ class AmazonBusinessAuth:
         """
         self.config = config
         self.driver: Optional[webdriver.Chrome] = None
+        self.session_cookies: Optional[list] = None
 
-    def _setup_driver(self) -> webdriver.Chrome:
-        """Set up and return a Chrome WebDriver instance."""
+    def _setup_driver(self, interactive: bool = False) -> webdriver.Chrome:
+        """Set up and return a Chrome WebDriver instance.
+
+        Args:
+            interactive: If True, show browser window for manual SSO login
+        """
         try:
             chrome_options = Options()
 
-            if self.config.get("selenium.headless", True):
+            # Only run headless if not in interactive mode
+            if not interactive and self.config.get("selenium.headless", True):
                 chrome_options.add_argument("--headless")
 
             # Add common Chrome options for better compatibility
@@ -100,8 +106,11 @@ class AmazonBusinessAuth:
         """
         keyring.set_password(self.KEYRING_SERVICE, email, password)
 
-    def login(self) -> webdriver.Chrome:
+    def login(self, interactive: bool = False) -> webdriver.Chrome:
         """Authenticate with Amazon Business and return logged-in driver.
+
+        Args:
+            interactive: If True, use interactive mode for SSO login
 
         Returns:
             Authenticated WebDriver instance
@@ -113,7 +122,12 @@ class AmazonBusinessAuth:
         if self.driver:
             self.driver.quit()
 
-        self.driver = self._setup_driver()
+        # Check if we need interactive mode for SSO
+        use_sso = self.config.get("amazon.use_sso", False)
+        if use_sso or interactive:
+            return self._login_sso()
+
+        self.driver = self._setup_driver(interactive=False)
 
         try:
             email, password = self.get_credentials()
@@ -240,6 +254,81 @@ class AmazonBusinessAuth:
                 self.driver.quit()
                 self.driver = None
             raise AuthenticationError(f"Login failed: {e}")
+
+    def _login_sso(self) -> webdriver.Chrome:
+        """Authenticate using SSO/Okta flow.
+
+        Returns:
+            Authenticated WebDriver instance
+
+        Raises:
+            AuthenticationError: If login fails
+        """
+        print("\n🔐 SSO Authentication Required")
+        print("A browser window will open for you to complete the login process.")
+        print("Please log in using your SSO credentials (Okta).\n")
+
+        self.driver = self._setup_driver(interactive=True)
+
+        try:
+            # Navigate to Amazon Business
+            business_url = self.config.get(
+                "amazon.business_url", "https://business.amazon.com"
+            )
+            self.driver.get(business_url)
+
+            # Wait for user to complete SSO login
+            wait = WebDriverWait(
+                self.driver, self.config.get("amazon.sso_timeout", 300)  # 5 minutes
+            )
+
+            print("Waiting for you to complete the SSO login...")
+            print("(This will timeout after 5 minutes)\n")
+
+            # Wait for successful login by checking for post-login elements
+            post_login_selectors = [
+                "#nav-link-accountList",
+                "[data-nav-role='signin']",
+                ".nav-user-name",
+                "#business-nav",
+                "[data-testid='business-header']",
+                ".ab-user-menu",
+            ]
+
+            logged_in = False
+            for selector in post_login_selectors:
+                try:
+                    wait.until(
+                        EC.presence_of_element_located((By.CSS_SELECTOR, selector))
+                    )
+                    # Also check that we're not on a login page
+                    current_url = self.driver.current_url.lower()
+                    if "signin" not in current_url and "ap/signin" not in current_url:
+                        logged_in = True
+                        break
+                except TimeoutException:
+                    continue
+
+            if not logged_in:
+                raise AuthenticationError(
+                    "SSO login timeout - could not verify successful authentication"
+                )
+
+            print("✅ SSO login successful!\n")
+
+            # Save cookies for potential reuse
+            self.session_cookies = self.driver.get_cookies()
+
+            # Give a moment for any final redirects
+            time.sleep(2)
+
+            return self.driver
+
+        except Exception as e:
+            if self.driver:
+                self.driver.quit()
+                self.driver = None
+            raise AuthenticationError(f"SSO login failed: {e}")
 
     def logout(self) -> None:
         """Log out and close the driver."""

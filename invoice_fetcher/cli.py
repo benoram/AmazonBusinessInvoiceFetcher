@@ -62,7 +62,12 @@ def main():
     is_flag=True,
     help="Show what would be downloaded without actually downloading",
 )
-def fetch(team: str, days: int, config: str, dry_run: bool):
+@click.option(
+    "--sso",
+    is_flag=True,
+    help="Use SSO authentication (opens browser for interactive login)",
+)
+def fetch(team: str, days: int, config: str, dry_run: bool, sso: bool):
     """Fetch invoices from Amazon Business for the specified team."""
 
     try:
@@ -83,9 +88,14 @@ def fetch(team: str, days: int, config: str, dry_run: bool):
         file_manager = FileManager(team_dir)
 
         # Authenticate and get invoices
-        with console.status("[bold green]Authenticating with Amazon Business..."):
+        if sso:
+            print_info("Using SSO authentication - browser will open for login")
             auth = AmazonBusinessAuth(cfg)
-            driver = auth.login()
+            driver = auth.login(interactive=True)
+        else:
+            with console.status("[bold green]Authenticating with Amazon Business..."):
+                auth = AmazonBusinessAuth(cfg)
+                driver = auth.login()
 
         print_success("Successfully authenticated with Amazon Business")
 

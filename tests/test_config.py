@@ -1,11 +1,9 @@
 """Tests for configuration module."""
 
-import pytest
-import os
-import pytest
 import os
 import tempfile
 import yaml
+import pytest
 from pathlib import Path
 from unittest.mock import patch
 
@@ -71,7 +69,13 @@ class TestConfig:
             # Create a config without email and test validation
             config = Config(config_file)
             # Mock the get method to return None for amazon.email
-            with patch.object(config, 'get', side_effect=lambda key, default=None: None if key == 'amazon.email' else config._config.get(key, default)):
+            with patch.object(
+                config,
+                "get",
+                side_effect=lambda key, default=None: (
+                    None if key == "amazon.email" else config._config.get(key, default)
+                ),
+            ):
                 with pytest.raises(ConfigurationError, match="email not configured"):
                     config.validate()
 

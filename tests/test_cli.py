@@ -1,6 +1,5 @@
 """Tests for CLI module."""
 
-import pytest
 from click.testing import CliRunner
 from unittest.mock import patch, MagicMock
 
@@ -43,6 +42,7 @@ class TestCLI:
         """Test fetch command in dry run mode."""
         # Mock configuration
         from pathlib import Path
+
         mock_cfg = MagicMock()
         mock_cfg.download_dir = Path("/tmp/invoices")
         mock_config.return_value = mock_cfg
