@@ -16,6 +16,7 @@ amazon:
   login_timeout: 60        # Maximum time to wait for login (seconds)
   use_sso: false           # Set to true for SSO/Okta authentication
   sso_timeout: 300         # Maximum time to wait for SSO login (seconds)
+  email: null              # Amazon Business email (can also be set via AMAZON_BUSINESS_EMAIL env var)
 
 # Logging configuration
 logging:

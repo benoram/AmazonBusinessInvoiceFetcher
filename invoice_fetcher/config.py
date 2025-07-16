@@ -2,6 +2,7 @@
 
 import os
 import yaml
+import copy
 from pathlib import Path
 from typing import Dict, Any, Optional
 from .exceptions import ConfigurationError
@@ -25,6 +26,7 @@ class Config:
         "amazon": {
             "business_url": "https://business.amazon.com",
             "login_timeout": 60,
+            "email": None,
         },
         "logging": {
             "level": "INFO",
@@ -39,7 +41,7 @@ class Config:
             config_file: Path to configuration file. If None, uses default location.
         """
         self.config_file = config_file or self.DEFAULT_CONFIG_FILE
-        self._config = self.DEFAULT_CONFIG.copy()
+        self._config = copy.deepcopy(self.DEFAULT_CONFIG)
         self._load_config()
 
     def _load_config(self) -> None:
@@ -143,5 +145,6 @@ class Config:
         if not self.amazon_email:
             raise ConfigurationError(
                 "Amazon Business email not configured. "
-                "Set AMAZON_BUSINESS_EMAIL environment variable or add to config file."
+                "Set AMAZON_BUSINESS_EMAIL environment variable or add 'email' "
+                "under 'amazon' section in config file."
             )

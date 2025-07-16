@@ -94,3 +94,51 @@ class TestConfig:
 
             assert "download_dir" in loaded_config
             assert "selenium" in loaded_config
+
+    def test_email_from_config_file(self):
+        """Test loading email from config file."""
+        with tempfile.TemporaryDirectory() as temp_dir:
+            config_file = Path(temp_dir) / "config.yaml"
+
+            test_config = {"amazon": {"email": "config@example.com"}}
+
+            with open(config_file, "w") as f:
+                yaml.dump(test_config, f)
+
+            config = Config(config_file)
+            assert config.amazon_email == "config@example.com"
+
+    def test_env_var_overrides_config_file(self):
+        """Test that environment variable takes precedence over config file."""
+        with tempfile.TemporaryDirectory() as temp_dir:
+            config_file = Path(temp_dir) / "config.yaml"
+
+            test_config = {"amazon": {"email": "config@example.com"}}
+
+            with open(config_file, "w") as f:
+                yaml.dump(test_config, f)
+
+            with patch.dict(os.environ, {"AMAZON_BUSINESS_EMAIL": "env@example.com"}):
+                config = Config(config_file)
+                assert config.amazon_email == "env@example.com"
+
+    def test_email_validation_with_config_file(self):
+        """Test validation passes when email is in config file."""
+        with tempfile.TemporaryDirectory() as temp_dir:
+            config_file = Path(temp_dir) / "config.yaml"
+
+            test_config = {"amazon": {"email": "valid@example.com"}}
+
+            with open(config_file, "w") as f:
+                yaml.dump(test_config, f)
+
+            config = Config(config_file)
+            config.validate()  # Should not raise
+
+    def test_default_config_includes_email(self):
+        """Test that DEFAULT_CONFIG includes email field."""
+        # Import fresh to avoid side effects from other tests
+        from invoice_fetcher.config import Config as FreshConfig
+
+        assert "email" in FreshConfig.DEFAULT_CONFIG["amazon"]
+        assert FreshConfig.DEFAULT_CONFIG["amazon"]["email"] is None

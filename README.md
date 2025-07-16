@@ -60,7 +60,7 @@ Before using this tool, ensure you have:
 You can configure the application using environment variables:
 
 ```bash
-# Required: Your Amazon Business email
+# Required: Your Amazon Business email (can also be set in config.yaml)
 export AMAZON_BUSINESS_EMAIL="your-email@company.com"
 
 # Optional: Password (if not set, will be prompted and stored securely)
@@ -73,6 +73,8 @@ export INVOICE_DOWNLOAD_DIR="~/Documents/invoices"
 export SELENIUM_HEADLESS="true"
 export SELENIUM_TIMEOUT="30"
 ```
+
+**Note**: The Amazon Business email can also be configured in the config file under `amazon.email`. Environment variables take precedence over config file values.
 
 ### Configuration File
 

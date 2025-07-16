@@ -78,22 +78,36 @@ invoices/
 
 ### Config File: `~/.invoice-fetcher/config.yaml`
 ```yaml
-amazon_business:
-  base_url: "https://business.amazon.com"
-  login_timeout: 30
+amazon:
+  business_url: "https://business.amazon.com"
+  login_timeout: 60
+  use_sso: false
+  sso_timeout: 300
+  email: null  # Amazon Business email (can also be set via AMAZON_BUSINESS_EMAIL env var)
   
-download:
-  base_directory: "./invoices"
-  date_range_days: 90
-  
+download_dir: "~/Downloads/invoices"
+
+selenium:
+  driver: "chrome"
+  headless: true
+  timeout: 30
+  page_load_timeout: 30
+
+logging:
+  level: "INFO"
+  file: null
+
 teams:
-  - engineering
-  - marketing
-  - finance
+  engineering:
+    # Optional team-specific download directory
+    # download_dir: "~/Downloads/invoices/engineering"
+  marketing:
+    # Optional team-specific settings
+    # download_dir: "~/Downloads/invoices/marketing"
 ```
 
 ### Environment Variables
-- `AMAZON_BUSINESS_EMAIL`: Login email
+- `AMAZON_BUSINESS_EMAIL`: Login email (takes precedence over config file)
 - `AMAZON_BUSINESS_PASSWORD`: Login password (optional, can prompt)
 
 ## Command Line Interface
